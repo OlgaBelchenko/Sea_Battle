@@ -6,12 +6,14 @@ public class Ship {
     private String shipClass;
     private final HashMap<String, Integer> shipClassHashMap = new HashMap<>();
 
+    // Class constructor
     public Ship() {
         setShipClassHashMap();
         shipClass = "Aircraft Carrier";
         setShipLength();
     }
 
+    // Setters
     public void setShipClassHashMap() {
         shipClassHashMap.put("Aircraft Carrier", 5);
         shipClassHashMap.put("Battleship", 4);
@@ -29,6 +31,7 @@ public class Ship {
         shipLength = shipClassHashMap.get(shipClass);
     }
 
+    // Getters
     public int getShipLength() {
         return shipLength;
     }
