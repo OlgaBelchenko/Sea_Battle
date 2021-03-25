@@ -5,7 +5,8 @@ import java.util.Scanner;
 public class SeaBattleGame {
 
     // Class fields
-    private final char[][] grid = new char[10][10];
+    private final char[][] placingGrid = new char[10][10];
+    private final char[][] shootingGrid = new char[10][10];
     private final HashMap<Character, Integer> rowHashMap = new HashMap<>();
     Ship ship = new Ship();
     Scanner scan = new Scanner(System.in);
@@ -18,15 +19,31 @@ public class SeaBattleGame {
 
     // Class constructor
     public SeaBattleGame() {
-        generateGrid();
+        generatePlacingGrid();
+        generateShootingGrid();
         generateRowHashMap();
-        printGrid();
+        printPlacingGrid();
     }
 
     // Initial field generation
-    public void generateGrid() {
-        for (char[] chars : grid) {
+    public void generatePlacingGrid() {
+        for (char[] chars : placingGrid) {
             Arrays.fill(chars, '~');
+        }
+    }
+
+    public void generateShootingGrid() {
+        for (char[] chars : shootingGrid) {
+            Arrays.fill(chars, '~');
+        }
+    }
+
+    // Generating HashMap for row names
+    public void generateRowHashMap() {
+        char key = 'A';
+        for (int value = 0; value < 10; value++) {
+            rowHashMap.put(key, value);
+            key++;
         }
     }
 
@@ -81,24 +98,15 @@ public class SeaBattleGame {
         }
     }
 
-    // Generating HashMap for row names
-    public void generateRowHashMap() {
-        char key = 'A';
-        for (int value = 0; value < 10; value++) {
-            rowHashMap.put(key, value);
-            key++;
-        }
-    }
-
     // Positioning the ship on the field if the position is OK
     public void positionShip() {
 
         for (int i = lowRowIndex; i <= topRowIndex; i++) {
             for (int j = lowColIndex; j <= topColIndex; j++) {
-                grid[i][j] = 'O';
+                placingGrid[i][j] = 'O';
             }
         }
-        printGrid();
+        printPlacingGrid();
     }
 
     // Checking if the indices for ship placement are wrong
@@ -135,34 +143,34 @@ public class SeaBattleGame {
         } else {
             for (int i = lowRowIndex; i <= topRowIndex; i++) {
                 for (int j = lowColIndex; j <= topColIndex; j++) {
-                    if (grid[i][j] == 'O') {
+                    if (placingGrid[i][j] == 'O') {
                         result = true;
                         errorText = "Error! The cells are already taken by another ship! Try again:";
                         break;
                     }
                     if (i != 0) {
-                        if (grid[i - 1][j] == 'O') {
+                        if (placingGrid[i - 1][j] == 'O') {
                             result = true;
                             errorText = "Error! You placed it too close to another one. Try again:";
                             break;
                         }
                     }
                     if (i != 9) {
-                        if (grid[i + 1][j] == 'O') {
+                        if (placingGrid[i + 1][j] == 'O') {
                             result = true;
                             errorText = "Error! You placed it too close to another one. Try again:";
                             break;
                         }
                     }
                     if (j != 0) {
-                        if (grid[i][j - 1] == 'O') {
+                        if (placingGrid[i][j - 1] == 'O') {
                             result = true;
                             errorText = "Error! You placed it too close to another one. Try again:";
                             break;
                         }
                     }
                     if (j != 9) {
-                        if (grid[i][j + 1] == 'O') {
+                        if (placingGrid[i][j + 1] == 'O') {
                             result = true;
                             errorText = "Error! You placed it too close to another one. Try again:";
                             break;
@@ -192,31 +200,36 @@ public class SeaBattleGame {
         return false;
     }
 
-    // Shooting
-    public void takeShot() {
-        char cell = grid[shootingRowIndex][shootingColIndex];
-        String message = "";
-        if (cell == 'O') {
-            grid[shootingRowIndex][shootingColIndex] = 'X';
-            message = "You hit a ship!";
-        } else if (cell == '~') {
-            grid[shootingRowIndex][shootingColIndex] = 'M';
-            message = "You missed!";
-        }
-        printGrid();
-        System.out.println(message);
-    }
+    public void printPlacingGrid() {
 
-    public void printGrid() {
         System.out.println();
         System.out.println("  1 2 3 4 5 6 7 8 9 10");
         char rowLabel = 'A';
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = -1; j < grid[i].length; j++) {
+        for (char[] chars : placingGrid) {
+            for (int j = -1; j < chars.length; j++) {
                 if (j == -1) {
                     System.out.print(rowLabel);
                 } else {
-                    System.out.print(" " + grid[i][j]);
+                    System.out.print(" " + chars[j]);
+                }
+            }
+            rowLabel++;
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    public void printShootingGrid() {
+
+        System.out.println();
+        System.out.println("  1 2 3 4 5 6 7 8 9 10");
+        char rowLabel = 'A';
+        for (char[] chars : shootingGrid) {
+            for (int j = -1; j < chars.length; j++) {
+                if (j == -1) {
+                    System.out.print(rowLabel);
+                } else {
+                    System.out.print(" " + chars[j]);
                 }
             }
             rowLabel++;
@@ -226,6 +239,12 @@ public class SeaBattleGame {
     }
 
     public void playGame() {
+        placeShips();
+        shoot();
+    }
+
+    // Placing ships
+    public void placeShips() {
 
         for (int i = 0; i < 5; i++) {
 
@@ -252,12 +271,15 @@ public class SeaBattleGame {
                 ship.setShipClass("Destroyer");
             }
         }
+    }
 
-        // Shooting
+    // Shooting
+    public void shoot() {
+
         System.out.println();
         System.out.println("The game starts!");
         System.out.println();
-        this.printGrid();
+        this.printShootingGrid();
         System.out.println("Take a shot!");
         System.out.println();
         while (true) {
@@ -272,10 +294,28 @@ public class SeaBattleGame {
 
     }
 
+    public void takeShot() {
+        char cell = placingGrid[shootingRowIndex][shootingColIndex];
+        String message = "";
+        if (cell == 'O') {
+            placingGrid[shootingRowIndex][shootingColIndex] = 'X';
+            shootingGrid[shootingRowIndex][shootingColIndex] = 'X';
+            message = "You hit a ship!";
+        } else if (cell == '~') {
+            shootingGrid[shootingRowIndex][shootingColIndex] = 'M';
+            placingGrid[shootingRowIndex][shootingColIndex] = 'M';
+            message = "You missed!";
+        }
+        printShootingGrid();
+        System.out.println(message);
+        printPlacingGrid();
+    }
+
 
     public static void main(String[] args) {
         SeaBattleGame game = new SeaBattleGame();
-        game.playGame();
+        // game.playGame();
+        game.printShootingGrid();
         game.scan.close();
 
     }
