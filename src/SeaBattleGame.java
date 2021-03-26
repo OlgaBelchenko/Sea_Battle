@@ -7,9 +7,13 @@ public class SeaBattleGame {
     // Class fields
     private final char[][] placingGrid = new char[10][10];
     private final char[][] shootingGrid = new char[10][10];
+
     private final HashMap<Character, Integer> rowHashMap = new HashMap<>();
+
     Ship ship = new Ship();
+
     Scanner scan = new Scanner(System.in);
+
     int lowRowIndex;
     int lowColIndex;
     int topRowIndex;
@@ -274,6 +278,7 @@ public class SeaBattleGame {
     }
 
     // Shooting
+
     public void shoot() {
 
         System.out.println();
@@ -289,7 +294,9 @@ public class SeaBattleGame {
                 continue;
             }
             this.takeShot();
-            break;
+            if (isLastShip()) {
+                break;
+            }
         }
 
     }
@@ -300,22 +307,97 @@ public class SeaBattleGame {
         if (cell == 'O') {
             placingGrid[shootingRowIndex][shootingColIndex] = 'X';
             shootingGrid[shootingRowIndex][shootingColIndex] = 'X';
-            message = "You hit a ship!";
+            if (!isLastShip()) {
+                if (isShipNotComplete()) {
+                    message = "You hit a ship! Try again:";
+                } else {
+                    message = "You sank a ship! Specify a new target:";
+                }
+            } else {
+                message = "You sank the last ship. You won. Congratulations!";
+            }
+
         } else if (cell == '~') {
-            shootingGrid[shootingRowIndex][shootingColIndex] = 'M';
             placingGrid[shootingRowIndex][shootingColIndex] = 'M';
-            message = "You missed!";
+            shootingGrid[shootingRowIndex][shootingColIndex] = 'M';
+            message = "You missed! Try again:";
         }
         printShootingGrid();
         System.out.println(message);
-        printPlacingGrid();
+        System.out.println();
+    }
+
+    public boolean isLastShip() {
+        for (char[] charArr : placingGrid) {
+            for (char ch : charArr) {
+                if (ch == 'O') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isShipNotComplete() {
+        return isOAbove() || isOBelow() || isOLeft() || isORight();
+    }
+
+    public boolean isOBelow() {
+        if (shootingRowIndex < 9) {
+            for (int i = shootingRowIndex; i < placingGrid.length; i++) {
+                if (placingGrid[i][shootingColIndex] == 'O') {
+                    return true;
+                } else if (placingGrid[i][shootingColIndex] == '~' || placingGrid[i][shootingColIndex] == 'M') {
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isOAbove() {
+        if (shootingRowIndex > 0) {
+            for (int i = shootingRowIndex; i >= 0; i--) {
+                if (placingGrid[i][shootingColIndex] == 'O') {
+                    return true;
+                } else if (placingGrid[i][shootingColIndex] == '~' || placingGrid[i][shootingColIndex] == 'M') {
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isOLeft() {
+        if (shootingColIndex > 0) {
+            for (int i = shootingColIndex; i >= 0; i--) {
+                if (placingGrid[shootingRowIndex][i] == 'O') {
+                    return true;
+                } else if (placingGrid[shootingRowIndex][i] == '~' || placingGrid[shootingRowIndex][i] == 'M') {
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isORight() {
+        if (shootingColIndex < 9) {
+            for (int i = shootingColIndex; i < placingGrid.length; i++) {
+                if (placingGrid[shootingRowIndex][i] == 'O') {
+                    return true;
+                } else if (placingGrid[shootingRowIndex][i] == '~' || placingGrid[shootingRowIndex][i] == 'M') {
+                    break;
+                }
+            }
+        }
+        return false;
     }
 
 
     public static void main(String[] args) {
         SeaBattleGame game = new SeaBattleGame();
-        // game.playGame();
-        game.printShootingGrid();
+        game.playGame();
         game.scan.close();
 
     }
