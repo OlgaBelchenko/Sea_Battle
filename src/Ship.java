@@ -9,8 +9,6 @@ public class Ship {
     // Class constructor
     public Ship() {
         setShipClassHashMap();
-        shipClass = "Aircraft Carrier";
-        setShipLength();
     }
 
     // Setters
